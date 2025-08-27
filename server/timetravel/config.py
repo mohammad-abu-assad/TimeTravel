@@ -7,6 +7,9 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAX_CONTENT_LENGTH = 20 * 1024 * 1024
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True, "pool_recycle": 1800}
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-me-jwt")
+    JWT_ACCESS_TOKEN_EXPIRES = 60 * 60 * 4  # 4 hours
+
 
 class DevConfig(BaseConfig):
     DEBUG = True
