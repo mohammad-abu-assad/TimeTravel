@@ -1,10 +1,11 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRegister } from '../hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../../shared/auth/AuthProvider'
+import PasswordInput from '../../../shared/ui/PasswordInput'
+import FormField from '../../../shared/ui/FormField'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -15,45 +16,45 @@ type FormValues = z.infer<typeof schema>
 export default function RegisterPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [show, setShow] = useState(false)
-  const { register: fregister, handleSubmit, formState: { errors } } =
+  const { register: formRegister, handleSubmit, formState: { errors } } =
     useForm<FormValues>({ resolver: zodResolver(schema) })
   const mutation = useRegister()
 
   const onSubmit = async (data: FormValues) => {
-    const res = await mutation.mutateAsync(data)
-    await login(res.data.access_token)
-    navigate('/')
+    try {
+      const res = await mutation.mutateAsync(data)
+      await login(res.data.access_token)
+      navigate('/')
+    } catch {
+      // error handled centrally
+    }
   }
 
   return (
     <div className="col-md-5 mx-auto">
       <h2>Create account</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-3">
-        <label className="form-label">Email</label>
-        <input className="form-control mb-2" placeholder="you@example.com" {...fregister('email')} />
-        {errors.email && <div className="text-danger small">{errors.email.message}</div>}
-
-        <label className="form-label mt-2">Password</label>
-        <div className="input-group mb-2">
+        <FormField id="email" label="Email" error={errors.email?.message}>
           <input
             className="form-control"
-            type={show ? 'text' : 'password'}
-            placeholder="••••••••"
-            {...fregister('password')}
+            placeholder="you@example.com"
+            disabled={mutation.isPending}
+            {...formRegister('email')}
           />
-          <button type="button" className="btn btn-outline-secondary" onClick={() => setShow(s => !s)}>
-            {show ? 'Hide' : 'Show'}
-          </button>
-        </div>
-        {errors.password && <div className="text-danger small">{errors.password.message}</div>}
+        </FormField>
+
+        <FormField id="password" label="Password" error={errors.password?.message} className="mt-2">
+          <PasswordInput
+            placeholder="••••••••"
+            disabled={mutation.isPending}
+            {...formRegister('password')}
+          />
+        </FormField>
 
         <button className="btn btn-primary mt-3" disabled={mutation.isPending}>
           {mutation.isPending ? 'Creating…' : 'Sign up'}
         </button>
       </form>
-
-      {mutation.isError && <div className="alert alert-danger mt-3">{(mutation.error as Error).message}</div>}
 
       <div className="mt-3">
         Already have an account? <Link to="/login">Log in</Link>
