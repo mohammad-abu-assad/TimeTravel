@@ -1,11 +1,11 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLogin } from '../hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../../shared/auth/AuthProvider'
-
+import PasswordInput from '../../../shared/ui/PasswordInput'
+import FormField from '../../../shared/ui/FormField'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -16,45 +16,45 @@ type FormValues = z.infer<typeof schema>
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [show, setShow] = useState(false)
   const { register, handleSubmit, formState: { errors } } =
     useForm<FormValues>({ resolver: zodResolver(schema) })
   const mutation = useLogin()
 
   const onSubmit = async (data: FormValues) => {
-    const res = await mutation.mutateAsync(data)
-    await login(res.data.access_token)
-    navigate('/')
+    try {
+      const res = await mutation.mutateAsync(data)
+      await login(res.data.access_token)
+      navigate('/')
+    } catch {
+      // error handled centrally
+    }
   }
 
   return (
     <div className="col-md-5 mx-auto">
       <h2>Log in</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-3">
-        <label className="form-label">Email</label>
-        <input className="form-control mb-2" placeholder="you@example.com" {...register('email')} />
-        {errors.email && <div className="text-danger small">{errors.email.message}</div>}
-
-        <label className="form-label mt-2">Password</label>
-        <div className="input-group mb-2">
+        <FormField id="email" label="Email" error={errors.email?.message}>
           <input
             className="form-control"
-            type={show ? 'text' : 'password'}
+            placeholder="you@example.com"
+            disabled={mutation.isPending}
+            {...register('email')}
+          />
+        </FormField>
+
+        <FormField id="password" label="Password" error={errors.password?.message} className="mt-2">
+          <PasswordInput
             placeholder="••••••••"
+            disabled={mutation.isPending}
             {...register('password')}
           />
-          <button type="button" className="btn btn-outline-secondary" onClick={() => setShow(s => !s)}>
-            {show ? 'Hide' : 'Show'}
-          </button>
-        </div>
-        {errors.password && <div className="text-danger small">{errors.password.message}</div>}
+        </FormField>
 
         <button className="btn btn-primary mt-3" disabled={mutation.isPending}>
           {mutation.isPending ? 'Signing in…' : 'Log in'}
         </button>
       </form>
-
-      {mutation.isError && <div className="alert alert-danger mt-3">{(mutation.error as Error).message}</div>}
 
       <div className="mt-3">
         New here? <Link to="/register">Create an account</Link>
