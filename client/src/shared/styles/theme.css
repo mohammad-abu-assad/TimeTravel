@@ -1,0 +1,56 @@
+:root{
+  --tt-bg: #f8fafc;
+  --tt-card: #ffffff;
+  --tt-radius: 14px;
+  --tt-shadow: 0 10px 30px rgba(16,24,40,.06);
+  --tt-brand: #0d6efd;        /* bootstrap primary */
+  --tt-accent: #198754;       /* bootstrap success */
+}
+
+/* Subtle app background */
+body{
+  background:
+    radial-gradient(1200px 500px at 15% 10%, rgba(13,110,253,.08), transparent),
+    radial-gradient(1200px 500px at 85% 90%, rgba(25,135,84,.08), transparent),
+    var(--tt-bg);
+}
+
+/* Card look */
+.tt-card{
+  background: var(--tt-card);
+  border: 0;
+  border-radius: var(--tt-radius);
+  box-shadow: var(--tt-shadow);
+}
+
+.tt-card-body{ padding: 1.5rem; }
+@media (min-width: 768px){ .tt-card-body{ padding: 2rem; } }
+
+/* Max content width for pages */
+.tt-container{ max-width: 1080px; }
+
+/* Page header */
+.tt-page-title{ letter-spacing:.2px; }
+.tt-subtitle{ color:#64748b; } /* slate-500-ish */
+
+/* Ensure primary vs success stay distinct */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: color-mix(in srgb, var(--bs-primary) 90%, black) !important;
+  border-color: color-mix(in srgb, var(--bs-primary) 90%, black) !important;
+}
+
+.btn-success {
+  background-color: var(--bs-success) !important;
+  border-color: var(--bs-success) !important;
+}
+.btn-success:hover,
+.btn-success:focus {
+  background-color: color-mix(in srgb, var(--bs-success) 90%, black) !important;
+  border-color: color-mix(in srgb, var(--bs-success) 90%, black) !important;
+}
+
